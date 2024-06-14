@@ -1,0 +1,17 @@
+.center-image {
+    position: relative;
+    width: 400px !important;
+    z-index: 99;
+}
+
+.secondary-image-container {
+    position: absolute;
+}
+
+img.secondary-image {
+    width: 320px !important;
+}
+
+img.tertiary-image {
+    width: 300px !important;
+}
