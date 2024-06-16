@@ -30,6 +30,7 @@ const RentYourOwnBoyfriend = () => {
       <div className="w-1/2 flex justify-center items-center">
         <Image
           src={couple}
+          alt="couple"
           className="h-[90vh] w-[600px] object-cover rounded-xl"></Image>
       </div>
     </section>
