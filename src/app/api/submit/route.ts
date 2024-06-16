@@ -1,10 +1,6 @@
-// src/app/api/submit/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { uploadFileToCloudinary } from "@/utils/cloudinary";
-import multer from "multer";
 import { saveToGoogleSheets } from "@/utils/saveToGoogleSheets";
-import { promises as fs } from "fs";
-import path from "path";
 
 const handler = async (req: NextRequest) => {
   try {
@@ -21,20 +17,17 @@ const handler = async (req: NextRequest) => {
       }
     }
 
-
     let count = 1;
     for (const file of files) {
-      const tempPath = path.join(process.cwd(), "uploads", file.name);
-      await fs.writeFile(tempPath, Buffer.from(await file.arrayBuffer()));
+      const buffer = Buffer.from(await file.arrayBuffer());
 
-      const result = await uploadFileToCloudinary(tempPath);
+      const result = await uploadFileToCloudinary(buffer, file.name);
       formData.append(`image_${count}`, result.url);
 
       count++;
-
-      await fs.unlink(tempPath);
     }
-    console.log("form data", formData);
+
+    console.log("formData", formData);
     await saveToGoogleSheets(formData);
 
     return NextResponse.json({
