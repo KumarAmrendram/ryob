@@ -8,10 +8,24 @@
     position: absolute;
 }
 
-img.secondary-image {
+.secondary-image {
     width: 320px !important;
 }
 
-img.tertiary-image {
+.tertiary-image {
     width: 300px !important;
+}
+
+@media (max-width: 450px) {
+    .center-image {
+        width: 150px !important;
+    }
+
+    .secondary-image {
+        width: 110px !important;
+    }
+
+    .tertiary-image {
+        width: 90px !important;
+    }
 }

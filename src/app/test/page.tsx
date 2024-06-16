@@ -1,10 +1,9 @@
 import React from "react";
-import RentYourOwnBoyfriend from "@/components/RentYourOwnBoyfriend";
-import Form from "@/components/Form";
+import Hero from "@/components/Hero";
 const page = () => {
   return (
     <div>
-      <Form />
+      <Hero />
     </div>
   );
 };
