@@ -6,12 +6,6 @@ import { saveToGoogleSheets } from "@/utils/saveToGoogleSheets";
 import { promises as fs } from "fs";
 import path from "path";
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
 const handler = async (req: NextRequest) => {
   try {
     const formData = await req.formData();
