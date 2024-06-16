@@ -1,11 +1,12 @@
-import React from 'react'
-import RentYourOwnBoyfriend from '@/components/RentYourOwnBoyfriend';
+import React from "react";
+import RentYourOwnBoyfriend from "@/components/RentYourOwnBoyfriend";
+import Form from "@/components/Form";
 const page = () => {
   return (
     <div>
-    <RentYourOwnBoyfriend />
+      <Form />
     </div>
-  )
-}
+  );
+};
 
-export default page
+export default page;

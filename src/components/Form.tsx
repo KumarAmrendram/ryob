@@ -8,7 +8,7 @@ import file from "@public/images/files.png";
 import "react-datepicker/dist/react-datepicker.css";
 import "./form.css";
 
-interface fromData {
+interface FormData {
   firstName: string;
   lastName: string;
   bio: string;
@@ -55,7 +55,7 @@ const Form = () => {
     return (
       <div
         {...getRootProps()}
-        className="w-[300px] h-[300px] border border-dashed border-primary bg-red-50 rounded-2xl"
+        className="w-full h-60 border border-dashed border-primary bg-red-50 rounded-2xl"
         style={{
           borderImage:
             "repeating-linear-gradient(90deg, var(--tw-border-opacity) 0, var(--tw-border-opacity) 10px, transparent 10px, transparent 20px) 30 / 1 / 0 stretch",
@@ -69,8 +69,8 @@ const Form = () => {
             <p>{(selectedFiles[index]?.size! / 1024).toFixed(2)} KB</p>
           </div>
         ) : (
-          <div className="flex items-center justify-center w-[300px] h-[300px]">
-            <Image src={file} alt="" className="w-[200px] h-[200px]" />
+          <div className="flex items-center justify-center w-full h-full">
+            <Image src={file} alt="" className="w-40 h-40" />
           </div>
         )}
       </div>
@@ -86,61 +86,60 @@ const Form = () => {
     );
   };
 
-const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-  event.preventDefault();
-  const form = event.currentTarget;
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = event.currentTarget;
 
-  // Check if all drop zones are filled
-  if (selectedFiles.includes(null)) {
-    alert("Please upload an image in each drop zone.");
-    return;
-  }
-
-  const formData = new FormData(form);
-
-  // Append files to formData
-  selectedFiles.forEach((file, index) => {
-    if (file) {
-      formData.append(`file${index}`, file);
+    if (selectedFiles.includes(null)) {
+      alert("Please upload an image in each drop zone.");
+      return;
     }
-  });
 
-  for (const [key, value] of formData.entries()) {
-    console.log(`${key}: ${value}`);
-  }
+    const formData = new FormData(form);
 
-  const response = await fetch("/api/submit", {
-    method: "POST",
-    body: formData,
-  });
+    selectedFiles.forEach((file, index) => {
+      if (file) {
+        formData.append(`file${index}`, file);
+      }
+    });
 
-  if (response.ok) {
-    console.log("Form submitted successfully");
-  } else {
-    console.error("Form submission failed");
-  }
-};
+    for (const [key, value] of formData.entries()) {
+      console.log(`${key}: ${value}`);
+    }
 
+    const response = await fetch("/api/submit", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (response.ok) {
+      console.log("Form submitted successfully");
+    } else {
+      console.error("Form submission failed");
+    }
+  };
 
   return (
-    <section className="px-20">
-      <p className="text-5xl">Show Your Looks</p>
-      <p className="text-lg">
+    <section className="p-4 md:px-20">
+      <p className="text-3xl md:text-5xl">Show Your Looks</p>
+      <p className="text-lg my-4 md:my-1">
         &quot;Upload your images directly to this form for easy sharing and
         seamless collaboration&quot;
       </p>
-      <div className="flex space-x-4">
+      <div className="flex flex-wrap justify-center md:justify-between md:flex-row mx-auto md:w-[90%]">
         {selectedFiles.map((_, index) => (
-          <Dropzone key={index} index={index} />
+          <div key={index} className="w-[150px] md:w-1/5 m-2">
+            <Dropzone key={index} index={index} />
+          </div>
         ))}
       </div>
-      <div>
+      <div className="w-[90%] mx-auto">
         <p className="text-secondary uppercase text-2xl my-4 w-[300px] border-b-2 border-black">
           Personal Information
         </p>
         <form onSubmit={handleSubmit}>
-          <div className="flex my-4">
-            <div className="w-1/3 flex items-center border-b-2 border-black me-4">
+          <div className="flex flex-col md:flex-row my-4 space-y-4 md:space-y-0 md:space-x-4">
+            <div className="w-full md:w-1/3 flex items-center border-b-2 border-black">
               <label htmlFor="firstName" className="mr-4 pb-2">
                 First Name:
               </label>
@@ -152,7 +151,7 @@ const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
                 required
               />
             </div>
-            <div className="w-1/3 flex items-center border-b-2 border-black ms-4">
+            <div className="w-full md:w-1/3 flex items-center border-b-2 border-black">
               <label htmlFor="lastName" className="mr-4 pb-2">
                 Last Name:
               </label>
@@ -178,9 +177,9 @@ const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
               placeholder="write some cheese lines"
               required></textarea>
           </div>
-          <div className="my-4 flex justify-between items-center w-1/5">
+          <div className="my-4 flex flex-row items-start">
             <p>Gender: </p>
-            <div className="flex items-center justify-evenly pe-32">
+            <div className="flex items-center justify-evenly md:pe-32 ps-4">
               <input
                 type="radio"
                 id="male"
@@ -195,19 +194,18 @@ const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
               </label>
             </div>
           </div>
-          <div className="flex my-4">
-            <div className="w-1/3 flex justify-between border-b-2 border-black me-4">
+          <div className="flex flex-col md:flex-row my-4 space-y-4 md:space-y-0 md:space-x-4">
+            <div className="w-full md:w-1/3 flex justify-between border-b-2 border-black">
               <label htmlFor="dob">Date Of Birth:</label>
               <DatePicker
                 selected={startDate}
                 onChange={(date: Date) => setStartDate(date)}
                 maxDate={getMinDate()}
-                className="border-none focus:ring-0 focus:border-none focus:outline-none pb-2 me-40"
+                className="border-none focus:ring-0 focus:border-none focus:outline-none pb-2"
                 required
               />
             </div>
-
-            <div className="w-1/3 flex items-center border-b-2 border-black ms-4">
+            <div className="w-full md:w-1/3 flex items-center border-b-2 border-black">
               <label htmlFor="religion" className="mr-4 pb-2">
                 Religion:
               </label>
@@ -220,7 +218,7 @@ const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
               />
             </div>
           </div>
-          <div className="my-4 flex justify-between items-center w-3/5 md:pe-[400px]">
+          <div className="my-4 flex flex-col md:flex-row items-start space-y-4 md:space-y-0 md:space-x-4">
             <p>Resident Status:</p>
             <div className="flex items-center space-x-4">
               <div className="flex items-center">
@@ -251,7 +249,7 @@ const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
               </div>
             </div>
           </div>
-          <div className="my-4 flex justify-between items-center w-3/5 md:pe-[400px]">
+          <div className="my-4 flex flex-col md:flex-row items-start space-y-4 md:space-y-0 md:space-x-4">
             <p>Marital Status:</p>
             <div className="flex items-center space-x-4">
               <div className="flex items-center">
@@ -299,8 +297,8 @@ const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
             <p className="text-secondary uppercase text-xl my-4 w-[190px] border-b-2 border-black">
               Contact Details
             </p>
-            <div className="flex my-4">
-              <div className="w-1/3 flex items-center border-b-2 border-black me-4">
+            <div className="flex flex-col md:flex-row my-4 space-y-4 md:space-y-0 md:space-x-4">
+              <div className="w-full md:w-1/3 flex items-center border-b-2 border-black">
                 <label htmlFor="city" className="mr-4 pb-2">
                   City:
                 </label>
@@ -312,7 +310,7 @@ const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
                   required
                 />
               </div>
-              <div className="w-1/3 flex items-center border-b-2 border-black ms-4">
+              <div className="w-full md:w-1/3 flex items-center border-b-2 border-black">
                 <label htmlFor="state" className="mr-4 pb-2">
                   State:
                 </label>
@@ -325,8 +323,8 @@ const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
                 />
               </div>
             </div>
-            <div className="flex my-4">
-              <div className="w-1/3 flex items-center border-b-2 border-black me-4">
+            <div className="flex flex-col md:flex-row my-4 space-y-4 md:space-y-0 md:space-x-4">
+              <div className="w-full md:w-1/3 flex items-center border-b-2 border-black">
                 <label htmlFor="postalCode" className="mr-4 pb-2">
                   Postal Code:
                 </label>
@@ -338,7 +336,7 @@ const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
                   required
                 />
               </div>
-              <div className="w-1/3 flex items-center border-b-2 border-black ms-4">
+              <div className="w-full md:w-1/3 flex items-center border-b-2 border-black">
                 <label htmlFor="country" className="mr-4 pb-2">
                   Country:
                 </label>
@@ -351,8 +349,8 @@ const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
                 />
               </div>
             </div>
-            <div className="flex my-4">
-              <div className="w-1/3 flex items-center border-b-2 border-black me-4">
+            <div className="flex flex-col md:flex-row my-4 space-y-4 md:space-y-0 md:space-x-4">
+              <div className="w-full md:w-1/3 flex items-center border-b-2 border-black">
                 <label htmlFor="phone" className="mr-4 pb-2">
                   Phone:
                 </label>
@@ -364,7 +362,7 @@ const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
                   required
                 />
               </div>
-              <div className="w-1/3 flex items-center border-b-2 border-black ms-4">
+              <div className="w-full md:w-1/3 flex items-center border-b-2 border-black">
                 <label htmlFor="email" className="mr-4 pb-2">
                   Email:
                 </label>
@@ -380,7 +378,7 @@ const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
           </div>
           <button
             type="submit"
-            className="mt-4 bg-primary text-white px-4 py-2 rounded-md">
+            className="mt-4 bg-primary text-white px-4 py-2 rounded-md w-full md:w-[190px]">
             Submit
           </button>
         </form>
