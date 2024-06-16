@@ -1,53 +1,64 @@
-// pages/api/submitForm.ts
+// src/app/api/submit/route.ts
+import { NextRequest, NextResponse } from "next/server";
+import { uploadFileToCloudinary } from "@/utils/cloudinary";
+import multer from "multer";
+import { saveToGoogleSheets } from "@/utils/saveToGoogleSheets";
+import { promises as fs } from "fs";
+import path from "path";
 
-import { NextApiRequest, NextApiResponse } from "next";
-import { uploadFileToCloudinary } from "../../../utils/cloudinary";
-import { NextResponse } from "next/server";
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
 
-export async function POST(req: NextApiRequest, res: NextApiResponse) {
+const handler = async (req: NextRequest) => {
   try {
-    // Extract form fields and files from the request body
-    const {
-      firstName,
-      lastName,
-      bio,
-      gender,
-      religion,
-      residentStatus,
-      maritalStatus,
-      city,
-      state,
-      postalCode,
-      country,
-      phone,
-      email,
-      files,
-    } = req.body;
+    const formData = await req.formData();
 
-    // Array to store uploaded file URLs
-    const uploadedFileUrls: string[] = [];
+    const data: Record<string, any> = {};
+    const files: File[] = [];
 
-    // Upload each file to Cloudinary
-    for (const file of files) {
-      const fileUrl = await uploadFileToCloudinary(file);
-      uploadedFileUrls.push(fileUrl);
+    for (const [key, value] of formData.entries()) {
+      if (value instanceof File) {
+        files.push(value);
+      } else {
+        data[key] = value;
+      }
     }
 
-    // Now you have the access URLs for the uploaded files
-    console.log("Access URLs:", uploadedFileUrls);
 
-    // Here you can handle other form fields and store them in your database
+    let count = 1;
+    for (const file of files) {
+      const tempPath = path.join(process.cwd(), "uploads", file.name);
+      await fs.writeFile(tempPath, Buffer.from(await file.arrayBuffer()));
 
-    // Respond with success message or redirect to another page
-    return NextResponse.json(
-      { message: "Form submitted successfully" },
-      { status: 200 }
-    );
+      const result = await uploadFileToCloudinary(tempPath);
+      formData.append(`image_${count}`, result.url);
+
+      count++;
+
+      await fs.unlink(tempPath);
+    }
+    console.log("form data", formData);
+    await saveToGoogleSheets(formData);
+
+    return NextResponse.json({
+      success: true,
+      message: "Form submitted successfully",
+    });
   } catch (error) {
-    console.error("Error:", error);
+    console.error("Error handling form submission:", error);
     return NextResponse.json(
-      { error: "Error submitting form" },
+      {
+        success: false,
+        message: "Form submission failed",
+      },
       { status: 500 }
     );
   }
+};
+
+export async function POST(req: NextRequest) {
+  return handler(req);
 }
