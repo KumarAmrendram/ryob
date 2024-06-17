@@ -478,7 +478,7 @@ const Form = () => {
                   Email:
                 </label>
                 <input
-                  type="text"
+                  type="email"
                   id="email"
                   name="email"
                   className="flex-1 border-none focus:ring-0 focus:border-none focus:outline-none pb-2"
