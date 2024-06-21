@@ -4,7 +4,7 @@ import DatePicker from "react-datepicker";
 import { useDropzone } from "react-dropzone";
 import Image from "next/image";
 import file from "@public/images/files.png";
-import { toast } from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 
 import "react-datepicker/dist/react-datepicker.css";
 import "./form.css";
@@ -34,22 +34,6 @@ const Form = () => {
     null,
     null,
   ]);
-  const [formData, setFormData] = useState<FormData>({
-    firstName: "",
-    lastName: "",
-    bio: "",
-    gender: "male",
-    religion: "",
-    residentStatus: "Resident",
-    maritalStatus: "Unmarried",
-    city: "",
-    state: "",
-    postalCode: "",
-    country: "",
-    phone: "",
-    email: "",
-    files: [],
-  });
   const [isLoading, setIsLoading] = useState(false);
 
   const onDrop = useCallback(
@@ -67,13 +51,13 @@ const Form = () => {
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
       onDrop: (acceptedFiles) => onDrop(acceptedFiles, index),
       multiple: false,
-      accept: { "image/*": [] }, // Updated accept prop
+      accept: { "image/*": [] },
     });
 
     return (
       <div
         {...getRootProps()}
-        className="w-full h-60 border border-dashed border-primary bg-red-50 rounded-2xl"
+        className="w-full h-60 border border-dashed border-primary bg-red-50 rounded-2xl overflow-hidden"
         style={{
           borderImage:
             "repeating-linear-gradient(90deg, var(--tw-border-opacity) 0, var(--tw-border-opacity) 10px, transparent 10px, transparent 20px) 30 / 1 / 0 stretch",
@@ -83,6 +67,11 @@ const Form = () => {
           <p>Drop the file here ...</p>
         ) : selectedFiles[index] ? (
           <div className="p-4 text-center">
+            <img
+              src={URL.createObjectURL(selectedFiles[index] as Blob)}
+              alt="Preview"
+              className="object-contain h-full w-full"
+            />
             <p>{selectedFiles[index]?.name}</p>
             <p>{(selectedFiles[index]?.size! / 1024).toFixed(2)} KB</p>
           </div>
@@ -127,79 +116,25 @@ const Form = () => {
       console.log(`${key}: ${value}`);
     }
 
-    try {
-      setTimeout(() => {
-        toast.success("Form submitted successfully");
-        setFormData({
-          firstName: "",
-          lastName: "",
-          bio: "",
-          gender: "male",
-          religion: "",
-          residentStatus: "Resident",
-          maritalStatus: "Unmarried",
-          city: "",
-          state: "",
-          postalCode: "",
-          country: "",
-          phone: "",
-          email: "",
-          files: [],
-        });
-        setSelectedFiles([null, null, null, null]);
-        setStartDate(new Date());
-        setIsLoading(false);
-      }, 2000);
-      const response = await fetch("/api/submit", {
-        method: "POST",
-        body: formData,
-      });
+    const response = await fetch("/api/submit", {
+      method: "POST",
+      body: formData,
+    });
 
-      if (response.ok) {
-        console.log("Form submitted successfully");
-        // setTimeout(() => {
+    setIsLoading(false);
 
-        //   toast.success("Form submitted successfully");
-        //   setFormData({
-        //     firstName: "",
-        //     lastName: "",
-        //     bio: "",
-        //     gender: "male",
-        //     religion: "",
-        //     residentStatus: "Resident",
-        //     maritalStatus: "Unmarried",
-        //     city: "",
-        //     state: "",
-        //     postalCode: "",
-        //     country: "",
-        //     phone: "",
-        //     email: "",
-        //     files: [],
-        //   });
-        //   setSelectedFiles([null, null, null, null]);
-        //   setStartDate(new Date());
-        //   setIsLoading(false);
-        // }, 10);
-      } else {
-        toast.error("Form submission failed");
-        setIsLoading(false);
-      }
-    } catch (error) {
-      console.error("Form submission error:", error);
+    if (response.ok) {
+      toast.success("Form submitted successfully");
+      form.reset();
+      setSelectedFiles([null, null, null, null]);
+    } else {
       toast.error("Form submission failed");
-      setIsLoading(false);
     }
-  };
-
-  const handleInputChange = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = event.target;
-    setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
 
   return (
     <section className="p-4 md:px-20">
+      <Toaster />
       <p className="text-3xl md:text-5xl">Show Your Looks</p>
       <p className="text-lg my-4 md:my-1">
         &quot;Upload your images directly to this form for easy sharing and
@@ -227,8 +162,6 @@ const Form = () => {
                 id="firstName"
                 name="firstName"
                 className="flex-1 border-none focus:ring-0 focus:border-none focus:outline-none pb-2"
-                value={formData.firstName}
-                onChange={handleInputChange}
                 required
               />
             </div>
@@ -241,8 +174,6 @@ const Form = () => {
                 id="lastName"
                 name="lastName"
                 className="flex-1 border-none focus:ring-0 focus:border-none focus:outline-none pb-2"
-                value={formData.lastName}
-                onChange={handleInputChange}
                 required
               />
             </div>
@@ -258,8 +189,6 @@ const Form = () => {
               rows={5}
               cols={50}
               placeholder="write some cheese lines"
-              value={formData.bio}
-              onChange={handleInputChange}
               required></textarea>
           </div>
           <div className="my-4 flex flex-row items-start">
@@ -271,12 +200,22 @@ const Form = () => {
                 name="gender"
                 value="male"
                 className="custom-radio"
-                checked={formData.gender === "male"}
-                onChange={handleInputChange}
+                defaultChecked
                 required
               />
               <label htmlFor="male" className="mx-4">
                 Male
+              </label>
+              <input
+                type="radio"
+                id="female"
+                name="gender"
+                value="female"
+                className="custom-radio"
+                required
+              />
+              <label htmlFor="female" className="mx-4">
+                Female
               </label>
             </div>
           </div>
@@ -286,12 +225,9 @@ const Form = () => {
               <DatePicker
                 selected={startDate}
                 onChange={(date: Date) => setStartDate(date)}
-                peekNextMonth
-                showMonthDropdown
-                showYearDropdown
-                dropdownMode="select"
                 maxDate={getMinDate()}
-                className="border-none focus:ring-0 focus:border-none focus:outline-none"
+                className="border-none focus:ring-0 focus:border-none focus:outline-none pb-2"
+                required
               />
             </div>
             <div className="w-full md:w-1/3 flex items-center border-b-2 border-black">
@@ -303,8 +239,6 @@ const Form = () => {
                 id="religion"
                 name="religion"
                 className="flex-1 border-none focus:ring-0 focus:border-none focus:outline-none pb-2"
-                value={formData.religion}
-                onChange={handleInputChange}
                 required
               />
             </div>
@@ -319,8 +253,6 @@ const Form = () => {
                   name="residentStatus"
                   value="Resident"
                   className="custom-radio"
-                  checked={formData.residentStatus === "Resident"}
-                  onChange={handleInputChange}
                   required
                 />
                 <label htmlFor="resident" className="mx-2">
@@ -334,8 +266,6 @@ const Form = () => {
                   name="residentStatus"
                   value="Non-Resident"
                   className="custom-radio"
-                  checked={formData.residentStatus === "Non-Resident"}
-                  onChange={handleInputChange}
                   required
                 />
                 <label htmlFor="non-resident" className="mx-2">
@@ -354,8 +284,6 @@ const Form = () => {
                   name="maritalStatus"
                   value="Married"
                   className="custom-radio"
-                  checked={formData.maritalStatus === "Married"}
-                  onChange={handleInputChange}
                   required
                 />
                 <label htmlFor="married" className="mx-2">
@@ -369,8 +297,6 @@ const Form = () => {
                   name="maritalStatus"
                   value="Unmarried"
                   className="custom-radio"
-                  checked={formData.maritalStatus === "Unmarried"}
-                  onChange={handleInputChange}
                   required
                 />
                 <label htmlFor="unmarried" className="mx-2">
@@ -384,8 +310,6 @@ const Form = () => {
                   name="maritalStatus"
                   value="Divorced"
                   className="custom-radio"
-                  checked={formData.maritalStatus === "Divorced"}
-                  onChange={handleInputChange}
                   required
                 />
                 <label htmlFor="divorced" className="mx-2">
@@ -408,8 +332,6 @@ const Form = () => {
                   id="city"
                   name="city"
                   className="flex-1 border-none focus:ring-0 focus:border-none focus:outline-none pb-2"
-                  value={formData.city}
-                  onChange={handleInputChange}
                   required
                 />
               </div>
@@ -422,8 +344,6 @@ const Form = () => {
                   id="state"
                   name="state"
                   className="flex-1 border-none focus:ring-0 focus:border-none focus:outline-none pb-2"
-                  value={formData.state}
-                  onChange={handleInputChange}
                   required
                 />
               </div>
@@ -438,8 +358,6 @@ const Form = () => {
                   id="postalCode"
                   name="postalCode"
                   className="flex-1 border-none focus:ring-0 focus:border-none focus:outline-none pb-2"
-                  value={formData.postalCode}
-                  onChange={handleInputChange}
                   required
                 />
               </div>
@@ -452,8 +370,6 @@ const Form = () => {
                   id="country"
                   name="country"
                   className="flex-1 border-none focus:ring-0 focus:border-none focus:outline-none pb-2"
-                  value={formData.country}
-                  onChange={handleInputChange}
                   required
                 />
               </div>
@@ -468,8 +384,6 @@ const Form = () => {
                   id="phone"
                   name="phone"
                   className="flex-1 border-none focus:ring-0 focus:border-none focus:outline-none pb-2"
-                  value={formData.phone}
-                  onChange={handleInputChange}
                   required
                 />
               </div>
@@ -478,12 +392,10 @@ const Form = () => {
                   Email:
                 </label>
                 <input
-                  type="email"
+                  type="text"
                   id="email"
                   name="email"
                   className="flex-1 border-none focus:ring-0 focus:border-none focus:outline-none pb-2"
-                  value={formData.email}
-                  onChange={handleInputChange}
                   required
                 />
               </div>
@@ -493,23 +405,7 @@ const Form = () => {
             type="submit"
             className="mt-4 bg-primary text-white px-4 py-2 rounded-md w-full md:w-[190px] flex items-center justify-center">
             {isLoading ? (
-              <svg
-                className="animate-spin h-5 w-5 text-white mr-3"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24">
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"></circle>
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8v8H4z"></path>
-              </svg>
+              <div className="spinner-border animate-spin inline-block w-4 h-4 border-4 rounded-full" />
             ) : (
               "Submit"
             )}
