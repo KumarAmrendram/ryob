@@ -18,14 +18,17 @@
 
 @media (max-width: 450px) {
     .center-image {
-        width: 150px !important;
+        width: 120px !important;
     }
 
     .secondary-image {
-        width: 110px !important;
+        width: 80px !important;
     }
 
     .tertiary-image {
-        width: 90px !important;
+        width: 80px !important;
+    }
+    .border-text, .black-dot {
+        font-size: 10px;
     }
 }

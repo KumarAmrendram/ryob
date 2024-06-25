@@ -142,7 +142,7 @@ const Form = () => {
       </p>
       <div className="flex flex-wrap justify-center md:justify-between md:flex-row mx-auto md:w-[90%]">
         {selectedFiles.map((_, index) => (
-          <div key={index} className="w-[150px] md:w-1/5 m-2">
+          <div key={index} className="w-[75px] md:w-1/5 mx-2">
             <Dropzone key={index} index={index} />
           </div>
         ))}
@@ -205,18 +205,7 @@ const Form = () => {
               />
               <label htmlFor="male" className="mx-4">
                 Male
-              </label>
-              <input
-                type="radio"
-                id="female"
-                name="gender"
-                value="female"
-                className="custom-radio"
-                required
-              />
-              <label htmlFor="female" className="mx-4">
-                Female
-              </label>
+              </label>  
             </div>
           </div>
           <div className="flex flex-col md:flex-row my-4 space-y-4 md:space-y-0 md:space-x-4">
