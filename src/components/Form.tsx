@@ -135,8 +135,8 @@ const Form = () => {
   return (
     <section className="p-4 md:px-20">
       <Toaster />
-      <p className="text-3xl md:text-5xl">Show Your Looks</p>
-      <p className="text-lg my-4 md:my-1">
+      <p className="font-medium text-3xl md:text-5xl">Show Your Looks</p>
+      <p className="text-md my-4 md:my-1">
         &quot;Upload your images directly to this form for easy sharing and
         seamless collaboration&quot;
       </p>
