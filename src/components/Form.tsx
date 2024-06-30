@@ -1,4 +1,4 @@
-"use client";
+"use client"
 import React, { useCallback, useState } from "react";
 import DatePicker from "react-datepicker";
 import { useDropzone } from "react-dropzone";
@@ -23,6 +23,7 @@ interface FormData {
   country: string;
   phone: string;
   email: string;
+  address: string; // Added for clarification, assuming this was part of your form
   files: File[];
 }
 
@@ -39,9 +40,21 @@ const Form = () => {
   const onDrop = useCallback(
     (acceptedFiles: File[], index: number) => {
       if (acceptedFiles.length > 0) {
-        const updatedFiles = [...selectedFiles];
-        updatedFiles[index] = acceptedFiles[0];
-        setSelectedFiles(updatedFiles);
+        const existingFile = selectedFiles.find(
+          (file) =>
+            file &&
+            file.name === acceptedFiles[0].name &&
+            file.size === acceptedFiles[0].size
+        );
+        if (existingFile) {
+          toast.error(
+            "Duplicate file detected. Please choose a different file."
+          );
+        } else {
+          const updatedFiles = [...selectedFiles];
+          updatedFiles[index] = acceptedFiles[0];
+          setSelectedFiles(updatedFiles);
+        }
       }
     },
     [selectedFiles]
@@ -93,13 +106,56 @@ const Form = () => {
     );
   };
 
+  const validateEmail = (email: string) => {
+    const emailProviders = [
+      "gmail.com",
+      "outlook.com",
+      "yahoo.com",
+      "icloud.com",
+    ];
+    const emailParts = email.split("@");
+    return emailParts.length === 2 && emailProviders.includes(emailParts[1]);
+  };
+
+  const validatePhone = (phone: string) => {
+    const phoneRegex = /^[6-9]\d{9}$/;
+    return phoneRegex.test(phone);
+  };
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsLoading(true);
     const form = event.currentTarget;
 
+    const firstName = form.firstName.value;
+    const lastName = form.lastName.value;
+    const email = form.email.value;
+    const phone = form.phone.value;
+
+    if (!firstName || !lastName) {
+      toast.error("First and Last Name are required.");
+      setIsLoading(false);
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      toast.error(
+        "Invalid email address. Please use a valid provider (gmail, outlook, yahoo, icloud)."
+      );
+      setIsLoading(false);
+      return;
+    }
+
+    if (!validatePhone(phone)) {
+      toast.error(
+        "Invalid phone number. It should start with 6-9 and be exactly 10 digits."
+      );
+      setIsLoading(false);
+      return;
+    }
+
     if (selectedFiles.includes(null)) {
-      alert("Please upload an image in each drop zone.");
+      toast.error("Please upload an image in each drop zone.");
       setIsLoading(false);
       return;
     }
@@ -135,10 +191,10 @@ const Form = () => {
   return (
     <section className="p-4 md:px-20">
       <Toaster />
-      <p className="font-medium text-3xl md:text-5xl">Show Your Looks</p>
+      <p className="font-medium text-3xl md:text-5xl">Impress Us</p>
       <p className="text-md my-4 md:my-1">
-        &quot;Upload your images directly to this form for easy sharing and
-        seamless collaboration&quot;
+        &ldquo;Upload your images directly to this form for easy sharing and
+        seamless collaboration&rdquo;
       </p>
       <div className="flex flex-wrap justify-center md:justify-between md:flex-row mx-auto md:w-[90%]">
         {selectedFiles.map((_, index) => (
@@ -188,7 +244,7 @@ const Form = () => {
               name="bio"
               rows={5}
               cols={50}
-              placeholder="write some cheese lines"
+              placeholder="write some cheezy lines"
               required></textarea>
           </div>
           <div className="my-4 flex flex-row items-start">
@@ -205,7 +261,7 @@ const Form = () => {
               />
               <label htmlFor="male" className="mx-4">
                 Male
-              </label>  
+              </label>
             </div>
           </div>
           <div className="flex flex-col md:flex-row my-4 space-y-4 md:space-y-0 md:space-x-4">
@@ -215,8 +271,12 @@ const Form = () => {
                 selected={startDate}
                 onChange={(date: Date) => setStartDate(date)}
                 maxDate={getMinDate()}
+                minDate={new Date(1990, 0, 1)} // January 1, 1990
                 className="border-none focus:ring-0 focus:border-none focus:outline-none pb-2"
                 required
+                showMonthDropdown
+                showYearDropdown
+                dropdownMode="select"
               />
             </div>
             <div className="w-full md:w-1/3 flex items-center border-b-2 border-black">

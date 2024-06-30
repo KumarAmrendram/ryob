@@ -18,13 +18,14 @@ const RentYourOwnBoyfriend = () => {
             <p className="text-[3rem] lg:text-[10rem] font-medium leading-tight">
               Boyfriend
             </p>
-          </div>
+          </div>  
         </div>
         <p className="my-4 text-xs lg:my-0 md:text-lg">
-          Join RYOB India! we&apos;re a platform for all men to offer
-          companionship to women seeking friendly dates. We promote respect,
-          consent, and appropriate behavior. Looking forward to having you in
-          out community!{" "}
+          We&#39;re inviting men to join our vibrant platform, where you can offer
+          companionship to women seeking friendly and respectful dates. At RYOB
+          India, we emphasize respect, consent, and appropriate behavior,
+          ensuring a positive experience for everyone. Join us today to be part
+          of a welcoming community and enjoy exciting perks along the way!
         </p>
       </div>
       <div className="lg:w-1/2 flex justify-center items-center">
